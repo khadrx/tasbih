@@ -3,8 +3,8 @@ name: Build & Release AAB
 on:
   push:
     tags:
-      - 'v*'           # triggers on: git tag v1.0.0 && git push --tags
-  workflow_dispatch:   # allows manual trigger from GitHub UI
+      - 'v*'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -23,10 +23,14 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      # ── 3. Decode keystore from secret ───────────
+      # ── 3. Decode keystore ───────────────────────
+      # tr -d '[:space:]' removes any newlines/spaces that PowerShell adds
       - name: Decode keystore
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > tasbih-release.keystore
+          echo "${{ secrets.KEYSTORE_BASE64 }}" \
+            | tr -d '[:space:]' \
+            | base64 --decode > tasbih-release.keystore
+          echo "Keystore size: $(wc -c < tasbih-release.keystore) bytes"
 
       # ── 4. Build signed release AAB ──────────────
       - name: Build Release AAB
@@ -38,9 +42,9 @@ jobs:
           chmod +x gradlew
           ./gradlew bundleRelease \
             -Pandroid.injected.signing.store.file=$(pwd)/tasbih-release.keystore \
-            -Pandroid.injected.signing.store.password=$KEYSTORE_PASS \
-            -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
-            -Pandroid.injected.signing.key.password=$KEY_PASS
+            -Pandroid.injected.signing.store.password="$KEYSTORE_PASS" \
+            -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+            -Pandroid.injected.signing.key.password="$KEY_PASS"
 
       # ── 5. Upload AAB as artifact ─────────────────
       - name: Upload AAB
@@ -60,10 +64,6 @@ jobs:
           body: |
             ## تسابيح ${{ github.ref_name }}
             
-            ### التثبيت
-            هذا ملف AAB مخصص لرفعه مباشرة على Google Play Console.
-            
-            ### Installation
-            This AAB file is for uploading to Google Play Console directly.
+            ملف AAB مخصص للرفع على Google Play Console.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
