@@ -1,0 +1,39 @@
+.gradle
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+/build
+/captures
+.externalNativeBuild
+.cxx
+
+# ── Android ──
+*.iml
+.gradle/
+local.properties
+.idea/
+.DS_Store
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+*.orig
+
+# ── Keystore — NEVER commit this ──
+*.keystore
+*.jks
+keystore.properties
+
+# ── Release outputs ──
+*.apk
+*.aab
+
+# ── Kotlin ──
+/out/
+
+# ── Gradle ──
+/.gradle
+gradle.properties.local
